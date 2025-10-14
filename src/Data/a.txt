@@ -1,0 +1,3 @@
+adb shell setprop persist.debug
+adb shell setprop persist.debug2
+adb shell setprop persist.debug3
