@@ -1,0 +1,20 @@
+{
+	"UNIPNP_LOG_SWITCH": {
+		"UNIPNP_LOG": [
+          "setprop persist.unipnp.debug",
+          "setprop persist.unipnp.debug.fm",
+          "setprop persist.unipnp.debug.em",
+          "setprop persist.unipnp.debug.am"
+        ],
+		
+		"AppForeGroundScene": [
+          "setprop persist.unipnp.appfg"
+        ]
+    },
+	
+	"OTHERS": {
+		"others_cmd": [
+          "test"
+        ]
+	}
+}

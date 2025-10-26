@@ -6,10 +6,13 @@ import java.awt.*;
 import java.io.File;
 import java.nio.file.Paths;
 
-public class PBTXProcessorPanel extends JPanel {
+import interfaces.DeviceSelectionListener;
+
+public class PBTXProcessorPanel extends JPanel implements DeviceSelectionListener{
     private JTextField pbtxFilePathField;
     private JTextField intValueField;
     private int globalIntValue = 10;
+    private String selectedDeviceId;
 
     public PBTXProcessorPanel() {
         initializeUI();
@@ -134,5 +137,10 @@ public class PBTXProcessorPanel extends JPanel {
 
     private void showError(String message) {
         JOptionPane.showMessageDialog(this, message, "错误", JOptionPane.ERROR_MESSAGE);
+    }
+
+    @Override
+    public void onDeviceSelected(String newDeviceId) {
+        this.selectedDeviceId = newDeviceId;
     }
 }

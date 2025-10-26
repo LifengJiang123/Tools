@@ -1,17 +1,19 @@
 // MainApplication.java
-import Tabs.CommandButtonPanel;
-import Tabs.FileSelectorPanel;
-import Tabs.TextLineSelectorPanel;
-import Tabs.PBTXProcessorPanel;
+import Tabs.*;
 import Utils.CommandExecutor;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
+import java.util.ArrayList;
+
+import interfaces.DeviceSelectionListener;
 
 public class MainApplication {
     private String selectedDeviceId = ""; // 全局变量存储选中的设备ID
     private JComboBox<String> deviceComboBox; // 设备选择下拉列表
     private DefaultComboBoxModel<String> deviceModel; // 下拉列表模型
+    private List<DeviceSelectionListener> deviceListeners = new ArrayList<>(); // 添加监听器列表
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -50,7 +52,7 @@ public class MainApplication {
             String selected = (String) deviceComboBox.getSelectedItem();
             if (selected != null && !selected.isEmpty()) {
                 selectedDeviceId = selected.split("\\s+")[0]; // 提取设备ID（第一列）
-                System.out.println("选中的设备ID: " + selectedDeviceId);
+                notifyDeviceSelection(selectedDeviceId);
             }
         });
 
@@ -84,11 +86,20 @@ public class MainApplication {
 
         // 右侧TabbedPane
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("文件选择器", new FileSelectorPanel());
-        tabbedPane.addTab("文本行选择器", new TextLineSelectorPanel());
-        tabbedPane.addTab("命令按钮面板", new CommandButtonPanel());
-        tabbedPane.addTab("PBTX处理器", new PBTXProcessorPanel());
-        tabbedPane.addTab("命令", new CommandButtonPanel());
+        DataCommandPanel dataCommandPanel = new DataCommandPanel();
+        FileSelectorPanel fileSelectorPanel = new FileSelectorPanel();
+        CommandButtonPanel commandButtonPanel = new CommandButtonPanel();
+        PBTXProcessorPanel pbtxProcessorPanel = new PBTXProcessorPanel();
+
+        addDeviceSelectionListener(dataCommandPanel);
+        addDeviceSelectionListener(fileSelectorPanel);
+        addDeviceSelectionListener(commandButtonPanel);
+        addDeviceSelectionListener(pbtxProcessorPanel);
+
+        tabbedPane.addTab("命令", dataCommandPanel);
+        tabbedPane.addTab("应用安装", fileSelectorPanel);
+        tabbedPane.addTab("命令按钮面板", commandButtonPanel);
+        tabbedPane.addTab("PBTX处理器", pbtxProcessorPanel);
 
         // 实现列表与Tab页的联动
         featureList.addListSelectionListener(e -> {
@@ -118,6 +129,23 @@ public class MainApplication {
         refreshDeviceList();
     }
 
+    // 添加设备选择监听器
+    public void addDeviceSelectionListener(DeviceSelectionListener listener) {
+        deviceListeners.add(listener);
+    }
+
+    // 移除设备选择监听器
+    public void removeDeviceSelectionListener(DeviceSelectionListener listener) {
+        deviceListeners.remove(listener);
+    }
+
+    // 通知所有监听器设备已选择
+    private void notifyDeviceSelection(String deviceId) {
+        for (DeviceSelectionListener listener : deviceListeners) {
+            listener.onDeviceSelected(deviceId);
+        }
+    }
+
     /**
      * 刷新设备列表
      */
@@ -143,7 +171,7 @@ public class MainApplication {
 
                 // 添加有效设备行
                 if (!line.startsWith("*") && line.contains("\t")) {
-                    deviceModel.addElement(line);
+                    deviceModel.addElement(line.split("\\s+")[0]);
                 }
             }
 

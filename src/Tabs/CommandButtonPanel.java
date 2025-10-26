@@ -4,8 +4,11 @@ import Utils.CommandExecutor;
 import javax.swing.*;
 import java.awt.*;
 
-public class CommandButtonPanel extends JPanel {
+import interfaces.DeviceSelectionListener;
+
+public class CommandButtonPanel extends JPanel implements DeviceSelectionListener{
     private JTextArea outputArea;
+    private String selectedDeviceId;
 
     public CommandButtonPanel() {
         initializeUI();
@@ -87,5 +90,10 @@ public class CommandButtonPanel extends JPanel {
 
     private void clearOutput() {
         outputArea.setText("");
+    }
+
+    @Override
+    public void onDeviceSelected(String newDeviceId) {
+        this.selectedDeviceId = newDeviceId;
     }
 }

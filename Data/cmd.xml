@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<commands>
+    <tabs name="unipnp">
+        <button name="switch" show="false">
+            <command>setprop persist.unipnp.debug</command>
+            <command>setprop persist.unipnp.debug.fm</command>
+            <command>setprop persist.unipnp.debug.em</command>
+            <command>setprop persist.unipnp.debug.am</command>
+        </button>
+        <button name="AppForeGroundScene">
+            <command>setprop persist.unipnp.appfg</command>
+        </button>
+    </tabs>
+
+    <tabs name="Others">
+        <button name="window" show="true">
+            <command>dumpsys window | findstr mCurrentFocus</command>
+        </button>
+    </tabs>
+</commands>

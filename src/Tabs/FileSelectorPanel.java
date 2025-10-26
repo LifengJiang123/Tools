@@ -1,19 +1,18 @@
 package Tabs;
 
-
-
-
-// FileSelectorPanel.java
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileSelectorPanel extends JPanel {
+import interfaces.DeviceSelectionListener;
+
+public class FileSelectorPanel extends JPanel implements DeviceSelectionListener{
     private List<String> selectedFiles;
     private JPanel checkBoxPanel;
     private JTextField folderPathField;
+    private String selectedDeviceId = "";
     private String defaultPath = "D:\\install\\lingma\\Lingma\\bin";
 
     public FileSelectorPanel() {
@@ -21,14 +20,6 @@ public class FileSelectorPanel extends JPanel {
         initializeUI();
         // 首次加载时自动加载默认路径的结果
         loadFilesFromPath(defaultPath);
-    }
-
-    public FileSelectorPanel(String defaultPath) {
-        this.selectedFiles = new ArrayList<>();
-        this.defaultPath = defaultPath != null ? defaultPath : System.getProperty("user.home");
-        initializeUI();
-        // 首次加载时自动加载默认路径的结果
-        loadFilesFromPath(this.defaultPath);
     }
 
     private void initializeUI() {
@@ -41,17 +32,20 @@ public class FileSelectorPanel extends JPanel {
 
         JButton browseButton = new JButton("浏览");
         JButton loadButton = new JButton("加载文件");
-        JButton printButton = new JButton("打印选中文件");
+        JButton printButton = new JButton("安装");
+        JButton selectAllButton = new JButton("取消所有选中");
 
         browseButton.addActionListener(e -> browseFolder());
         loadButton.addActionListener(e -> loadFiles());
         printButton.addActionListener(e -> printSelectedFiles());
+        selectAllButton.addActionListener(e -> processSelectAll());
 
         topPanel.add(new JLabel("文件夹路径:"));
         topPanel.add(folderPathField);
         topPanel.add(browseButton);
         topPanel.add(loadButton);
         topPanel.add(printButton);
+        topPanel.add(selectAllButton);
 
         // 中部面板：复选框区域
         checkBoxPanel = new JPanel();
@@ -120,11 +114,27 @@ public class FileSelectorPanel extends JPanel {
     }
 
     private void printSelectedFiles() {
-        StringBuilder message = new StringBuilder("选中的文件:\n");
+//        StringBuilder message = new StringBuilder("选中的文件:\n");
         for (String filePath : selectedFiles) {
-            message.append(filePath).append("\n");
+            System.out.println("adb -s " + selectedDeviceId + " install " + filePath);
+//            message.append(filePath).append("\n");
         }
-        JOptionPane.showMessageDialog(this, message.toString(), "选中文件列表", JOptionPane.INFORMATION_MESSAGE);
+//        System.out.println(message.toString());
+    }
+
+    private void processSelectAll() {
+        selectedFiles.clear(); // 清空选中文件列表
+
+        // 取消所有复选框的选中状态
+        Component[] components = checkBoxPanel.getComponents();
+        for (Component component : components) {
+            if (component instanceof JCheckBox) {
+                ((JCheckBox) component).setSelected(false);
+            }
+        }
+
+        // 可选：显示确认消息
+        // JOptionPane.showMessageDialog(this, "已清除所有选中的文件", "提示", JOptionPane.INFORMATION_MESSAGE);
     }
 
     // 提供设置默认路径的方法
@@ -140,5 +150,10 @@ public class FileSelectorPanel extends JPanel {
     // 获取当前默认路径
     public String getDefaultPath() {
         return this.defaultPath;
+    }
+
+    @Override
+    public void onDeviceSelected(String newDeviceId) {
+        this.selectedDeviceId = newDeviceId;
     }
 }
